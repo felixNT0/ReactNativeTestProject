@@ -1,4 +1,5 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+import Toast from 'react-native-toast-message';
 import {
   View,
   Text,
@@ -15,11 +16,14 @@ import {
 } from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IonIcons from 'react-native-vector-icons/Ionicons';
+
+// Import custom components
 import BottomNavigationBar from './src/components';
 import BottomModal from './src/components/BottomModal';
 import CenteredModal from './src/components/CenteredModal';
 
 const App = () => {
+  // Define states to manage various aspects of the app
   const [isPictureModalVisible, setPictureModalVisible] = useState(false);
   const [isLocationModalVisible, setLocationModalVisible] = useState(false);
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
@@ -29,6 +33,7 @@ const App = () => {
   const [postText, setPostText] = useState('');
   const [isPostSubmitted, setIsPostSubmitted] = useState(false);
 
+  // Function to open the image picker
   const openImagePicker = () => {
     const options: ImageLibraryOptions = {
       mediaType: 'photo',
@@ -47,23 +52,42 @@ const App = () => {
     });
   };
 
+  // Function to submit a post
   const submitPost = () => {
-    setIsPostSubmitted(true);
-    setSelectedPicture(null);
-    setSelectedLocation('');
-    setSelectedCategory('');
-    setPostText('');
-    setTimeout(() => {
-      setIsPostSubmitted(false);
-    }, 3000);
+    if (selectedPicture && selectedCategory && selectedLocation && postText) {
+      setIsPostSubmitted(true);
+      setSelectedPicture(null);
+      setSelectedLocation('');
+      setSelectedCategory('');
+      setPostText('');
+      setTimeout(() => {
+        setIsPostSubmitted(false);
+      }, 3000);
+    }
   };
 
+  // Define lists of locations and categories
   const locations = ['New York', 'Los Angeles', 'Chicago', 'Miami'];
   const categories = ['Painting', 'Indigenious', 'Tattooing'];
 
+  const showToast = () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Post Added',
+    });
+  };
+
+  useEffect(() => {
+    if (isPostSubmitted) {
+      showToast();
+    }
+  }, [isPostSubmitted]);
+
   return (
     <View style={styles.container}>
+      {/* Header section */}
       <View style={styles.header}>
+        {/* User icon */}
         <View
           style={{
             height: 50,
@@ -75,6 +99,7 @@ const App = () => {
           }}>
           <Text>HI</Text>
         </View>
+        {/* Action buttons */}
         <View
           style={{
             display: 'flex',
@@ -103,6 +128,7 @@ const App = () => {
       </View>
 
       <View>
+        {/* Text input for the post */}
         <TextInput
           style={styles.postInput}
           placeholder="Type here..."
@@ -120,6 +146,7 @@ const App = () => {
           }}>
           {selectedPicture && (
             <View>
+              {/* Display the selected image */}
               <Image
                 source={{uri: selectedPicture}}
                 style={{
@@ -133,6 +160,7 @@ const App = () => {
 
           {isPictureModalVisible && (
             <TouchableOpacity onPress={openImagePicker}>
+              {/* Button to open the image picker */}
               <View
                 style={{
                   backgroundColor: 'white',
@@ -201,6 +229,7 @@ const App = () => {
         )}
       </View>
 
+      {/* Location selection modal */}
       <BottomModal
         visible={isLocationModalVisible}
         onClose={() => setLocationModalVisible(false)}>
@@ -234,6 +263,7 @@ const App = () => {
         </View>
       </BottomModal>
 
+      {/* Category selection modal */}
       <CenteredModal
         visible={isCategoryModalVisible}
         onClose={() => setCategoryModalVisible(false)}>
@@ -263,12 +293,13 @@ const App = () => {
           )}
         />
       </CenteredModal>
+      <Toast />
       <BottomNavigationBar />
     </View>
   );
 };
 
-//all the styles in the main app component
+// All the styles in the main app component
 
 const styles = StyleSheet.create({
   container: {
